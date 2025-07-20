@@ -1,0 +1,15 @@
+# Core dependencies for UR robot control
+ur-rtde>=1.6.0
+
+# Configuration and CLI
+PyYAML>=6.0
+argparse
+
+# JSON handling is built-in to Python 3.x
+# Additional utilities (optional)
+numpy>=1.26.0
+matplotlib>=3.6.0  # For plotting robot trajectories (optional)
+
+# Development dependencies (uncomment if needed)
+# pytest>=7.4.0
+# flake8>=7.0.0

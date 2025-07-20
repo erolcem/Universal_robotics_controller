@@ -1,0 +1,76 @@
+# Robot Configuration Template
+# Copy this file to robot_config.yaml and modify for your setup
+
+# Robot connection settings
+robot:
+  # Robot type: "simulation" or "physical"
+  type: "simulation"
+  
+  # IP address of the robot or simulator
+  ip: "127.0.0.1"
+  
+  # Robot model (UR3e, UR5e, UR10e, etc.)
+  model: "UR5e"
+  
+  # RTDE communication frequency (Hz)
+  frequency: 500.0
+
+# Simulation settings (for URSim)
+simulation:
+  # Docker container name
+  container_name: "ursim_e_series"
+  
+  # VNC web interface URL
+  vnc_url: "http://localhost:6080/vnc.html"
+  
+  # Ports used by the simulator
+  ports:
+    vnc: 5900
+    web_vnc: 6080
+    rtde: 29999
+    dashboard: 29998
+    communication: [30001, 30002, 30003, 30004]
+
+# Physical robot settings
+physical:
+  # Safety settings
+  safety:
+    max_velocity: 0.5  # m/s
+    max_acceleration: 1.0  # m/s²
+    workspace_limits:
+      x: [-0.8, 0.8]  # meters
+      y: [-0.8, 0.8]  # meters  
+      z: [0.0, 1.0]   # meters
+  
+  # Network settings
+  network:
+    timeout: 5.0  # seconds
+    
+# Movement settings
+movement:
+  # Default speeds and accelerations
+  default_speed: 0.2  # m/s
+  default_acceleration: 0.5  # m/s²
+  
+  # Command responsiveness (time between commands)
+  responsiveness: 1.0  # seconds
+
+# Logging settings
+logging:
+  # Directory for log files
+  log_dir: "logs"
+  
+  # Log file naming
+  timestamp_format: "%Y%m%d_%H%M%S"
+  
+  # Log level (DEBUG, INFO, WARNING, ERROR)
+  level: "INFO"
+
+# File paths
+paths:
+  # Directory for JSONL command files
+  commands_dir: "examples"
+  
+  # Default command files
+  synchronous_commands: "examples/synchronous_deltas.jsonl"
+  asynchronous_commands: "examples/asynchronous_deltas.jsonl"

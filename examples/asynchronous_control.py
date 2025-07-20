@@ -44,9 +44,17 @@ def main():
     print(f"⚡ Acceleration: {args.acceleration} m/s²")
     print("\n💡 Tip: Add new commands to the file while this is running!")
     
+    # Use default config if none specified
+    config_path = args.config
+    if not config_path:
+        default_config = Path(__file__).parent.parent / "config" / "robot_config.yaml"
+        if default_config.exists():
+            config_path = str(default_config)
+            print(f"📁 Using default config: {config_path}")
+    
     # Initialize controller
-    if args.config:
-        controller = URRobotController(config_path=args.config)
+    if config_path:
+        controller = URRobotController(config_path=config_path)
     else:
         controller = URRobotController(
             robot_ip=args.robot_ip, 

@@ -62,7 +62,7 @@ def test_basic_movements(controller: URRobotController) -> bool:
     ]
     
     for description, delta in movements:
-        print(f"🔄 {description}...")
+        print(f" {description}...")
         
         # Calculate target pose
         target_pose = [initial_pose[i] + delta[i] for i in range(6)]
@@ -91,7 +91,7 @@ def test_velocity_control(controller: URRobotController) -> bool:
     ]
     
     for description, velocity in velocities:
-        print(f"🔄 {description}...")
+        print(f" {description}...")
         
         if controller.move_velocity(velocity, duration=2.0):
             time.sleep(2.5)  # Wait for movement
@@ -107,10 +107,10 @@ def test_velocity_control(controller: URRobotController) -> bool:
 def main():
     """Main example function."""
     parser = argparse.ArgumentParser(description="UR Robot Basic Example")
-    parser.add_argument("--config", help="Path to configuration file")
-    parser.add_argument("--robot-ip", default="127.0.0.1", help="Robot IP address")
+    parser.add_argument("--config", help="Path to configuration file (default: config/robot_config.yaml)")
+    parser.add_argument("--robot-ip", default="127.0.0.1", help="Robot IP address (overrides config)")
     parser.add_argument("--robot-type", choices=["simulation", "physical"], 
-                       default="simulation", help="Robot type")
+                       default="simulation", help="Robot type (overrides config)")
     parser.add_argument("--skip-movements", action="store_true", 
                        help="Skip movement tests (connection only)")
     
@@ -119,9 +119,17 @@ def main():
     print("🤖 UR Robot Controller - Basic Example")
     print("=" * 40)
     
+    # Use default config if none specified
+    config_path = args.config
+    if not config_path:
+        default_config = Path(__file__).parent.parent / "config" / "robot_config.yaml"
+        if default_config.exists():
+            config_path = str(default_config)
+            print(f"📁 Using default config: {config_path}")
+    
     # Initialize controller
-    if args.config:
-        controller = URRobotController(config_path=args.config)
+    if config_path:
+        controller = URRobotController(config_path=config_path)
     else:
         controller = URRobotController(
             robot_ip=args.robot_ip, 
@@ -142,7 +150,7 @@ def main():
             if not test_velocity_control(controller):
                 return 1
         
-        print("\n🎉 All tests completed successfully!")
+        print("\n All tests completed successfully!")
         return 0
         
     except KeyboardInterrupt:
@@ -153,7 +161,7 @@ def main():
         return 1
     finally:
         controller.disconnect()
-        print("👋 Disconnected from robot")
+        print(" Disconnected from robot")
 
 
 if __name__ == "__main__":

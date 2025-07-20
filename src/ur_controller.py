@@ -49,15 +49,15 @@ class URRobotController:
         self.robot_type = robot_type
         self.frequency = frequency
         
+        # Setup logging first
+        self.setup_logging()
+        
         # Load configuration if provided
         if config_path and yaml:
             self.load_config(config_path)
             self.robot_ip = self.config.get('robot', {}).get('ip', robot_ip)
             self.robot_type = self.config.get('robot', {}).get('type', robot_type)
             self.frequency = self.config.get('robot', {}).get('frequency', frequency)
-        
-        # Setup logging
-        self.setup_logging()
         
         # RTDE interfaces
         self.rtde_c: Optional[rtde_control.RTDEControlInterface] = None

@@ -23,7 +23,7 @@ from ur_controller import URRobotController
 
 def scan_network_for_robots(network_base: str = "192.168.1") -> list:
     """Scan network for UR robots on common ports."""
-    print(f"🔍 Scanning {network_base}.0/24 for UR robots...")
+    print(f" Scanning {network_base}.0/24 for UR robots...")
     found_robots = []
     
     for i in range(1, 255):
@@ -47,7 +47,7 @@ def scan_network_for_robots(network_base: str = "192.168.1") -> list:
 
 def test_robot_connection(ip: str) -> dict:
     """Test connection to a specific robot."""
-    print(f"\n🔗 Testing connection to {ip}...")
+    print(f"\n Testing connection to {ip}...")
     
     controller = URRobotController(robot_ip=ip, robot_type="physical")
     
@@ -71,13 +71,13 @@ def test_robot_connection(ip: str) -> dict:
                     result['robot_mode'] = controller.rtde_r.getRobotMode()
                     result['safety_mode'] = controller.rtde_r.getSafetyMode()
                     
-                    print(f"🤖 Robot mode: {result['robot_mode']}")
-                    print(f"🛡️  Safety mode: {result['safety_mode']}")
+                    print(f" Robot mode: {result['robot_mode']}")
+                    print(f"  Safety mode: {result['safety_mode']}")
                     
                     # Try to get robot model (this might not be available via RTDE)
                     pose = controller.get_tcp_pose()
                     if pose:
-                        print(f"📍 TCP pose: {[round(p, 3) for p in pose]}")
+                        print(f" TCP pose: {[round(p, 3) for p in pose]}")
                     
                 except Exception as e:
                     print(f"⚠️  Could not get robot status: {e}")
@@ -136,14 +136,14 @@ paths:
     with open(config_filename, 'w') as f:
         f.write(config_content)
     
-    print(f"📄 Created configuration file: {config_filename}")
+    print(f" Created configuration file: {config_filename}")
     return config_filename
 
 
 def print_setup_instructions():
     """Print setup instructions for physical robots."""
     print("""
-🔧 Physical Robot Setup Instructions
+ Physical Robot Setup Instructions
 =====================================
 
 1. Network Connection:
@@ -193,7 +193,7 @@ def main():
     
     args = parser.parse_args()
     
-    print("🤖 UR Physical Robot Setup Tool")
+    print(" UR Physical Robot Setup Tool")
     print("=" * 35)
     
     if args.instructions:
@@ -208,7 +208,7 @@ def main():
                 test_robot_connection(robot)
         else:
             print("❌ No robots found")
-            print("\n💡 Tips:")
+            print("\n Tips:")
             print("- Check network connection")
             print("- Verify robot IP range")
             print("- Ensure robot is powered on")

@@ -21,7 +21,7 @@ def visual_movement_test():
     """Perform slow, visible movements for verification."""
     robot_ip = "127.0.0.1"
     
-    print("🎬 Visual Movement Test")
+    print(" Visual Movement Test")
     print("=" * 30)
     print("Watch the robot in the simulator web interface!")
     print("URL: http://localhost:6080/vnc.html")
@@ -29,7 +29,7 @@ def visual_movement_test():
     
     try:
         # Connect
-        print("🔗 Connecting...")
+        print(" Connecting...")
         rtde_c = rtde_control.RTDEControlInterface(robot_ip)
         rtde_r = rtde_receive.RTDEReceiveInterface(robot_ip)
         
@@ -41,9 +41,9 @@ def visual_movement_test():
         
         # Get initial pose
         initial_pose = rtde_r.getActualTCPPose()
-        print(f"📍 Starting pose: {[round(p, 3) for p in initial_pose]}")
+        print(f" Starting pose: {[round(p, 3) for p in initial_pose]}")
         
-        input("\n🎯 Press Enter to start slow movements (watch the simulator)...")
+        input("\n Press Enter to start slow movements (watch the simulator)...")
         
         # Slow movements that should be clearly visible
         moves = [
@@ -56,7 +56,7 @@ def visual_movement_test():
         ]
         
         for i, move in enumerate(moves, 1):
-            print(f"\n{i}/6 🔄 {move['name']}...")
+            print(f"\n{i}/6  {move['name']}...")
             print(f"     Target: {[round(p, 3) for p in move['pose']]}")
             
             # Very slow movement so it's clearly visible

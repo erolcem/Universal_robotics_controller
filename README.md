@@ -27,8 +27,8 @@ Which can be found on their respective websites.
 
 - **Python**: 3.8 or higher
 - **Operating System**: Linux (Ubuntu 20.04+), Windows 10/11, macOS 10.15+
-- **Robot Hardware**: Universal Robots e-Series (UR3e, UR5e, UR10e, UR16e, UR20) or URSim
-- **Network**: Ethernet connection to robot (for physical robots)
+- **Robot Hardware**: Universal Robots e-Series (UR3e, UR5e, UR10e, UR16e, UR20) if relevant
+- **Network**: Ethernet connection to robot (also relevant for physical robots)
 - **Docker**: Required for simulation mode
 
 ### 2. Environment setup
@@ -50,65 +50,79 @@ pip install -r requirements.txt
 
 ## Complete Guide:
 
-### **Step 1: Understanding the Basics**
+### **Step 1: Basic Concept**
 
-**What is RTDE?** Real-Time Data Exchange - it's the communication protocol that lets your computer talk to UR robots.
+**The robot uses RTDE** Real-Time Data Exchange - it's the communication protocol that lets your computer talk to UR robots. This is the core dependency you'll find in requirements.txt.
 
 **Simulation vs Physical Robot:**
-- **Simulation**: Practice with a virtual robot on your computer (safe, free, no hardware needed)
-- **Physical Robot**: Control real UR robots (requires actual robot hardware and network connection)
+- **Simulation**: RTDE controls the polyscope of the robot arm, which is a 1:1 simulation available anytime. 
+- **Physical Robot**: Control real UR robots (but requires actual robot hardware and network connection)
 
 ### **Step 2: Start with Simulation (Recommended)**
 
 The simulator lets you test everything safely before touching real robots.
 
+Please make sure all the installation step above is done and the virtual environment is activated.
+
 ```bash
-# Run this to start the virtual robot
+# Run this to start the virtual robot (default model 5e)
 ./scripts/startDocker.sh
 ```
-**What this does**: Downloads and starts a virtual UR robot that runs in Docker
+**What this does**: Both downloads AND starts a virtual UR robot that runs in Docker, can be found in startDocker.sh. The simulated model of the robot can be selected via:
+
+```bash
+# OPTIONAL: supported models UR3e, UR5e, UR10e, UR16e, UR20
+ROBOT_MODEL="UR10e" ./startDocker.sh
+```
 
 ```bash
 # Open this website to see your virtual robot
-# Navigate to: http://localhost:6080/vnc.html
+# http://localhost:6080/vnc.html
 ```
 **What you'll see**: A web-based interface showing a 3D robot that you can control
 
 **One-time setup in simulator:**
 1. Click "Confirm Safety Configuration" (acknowledges you understand robot safety)
 2. Turn ON "Simulation" switch (bottom right - enables simulation mode)
-3. Go to Program → Graphics (shows the robot visually)
-4. Go to Move → Press "ON" → Press "START" (starts the robot program)
-5. Return to Program → Graphics (go back to visual view)
+3. Go to Move → Press "ON" → Press "START" (starts the robot program)
+4. Go to Program → Graphics (shows the robot visually + ensure simulation is still on)
 
-Note: PDF in `docs/` folder has visual instructions if needed. Keep this simulator window open!
+Note: Keep this simulator window open, both website and terminal!
 
-### 🧪 **Step 3: Test Your Setup**
+### **Step 3: Test Your Simulation Setup**
 
-Open a **new terminal** (keep simulator running) and test these commands:
+Open a **new terminal** (keep simulator terminal running) and test these commands:
 
 ```bash
-# Activate your Python environment
+# Activate your Python environment again if not already
 source ur_venv/bin/activate
 
-# Test 1: Check if robot is ready
+# Test 1/3: Check if robot is ready
 python scripts/check_robot_status.py
+# In scripts, there are 3 testing files, this is the first of 2 you'll use for simulations.
 ```
-**What this does**: Connects to robot and shows its current status (position, safety mode, etc.)
+**What this does**: Connects to robot and shows its current status (position, safety mode, etc.) 
+and will help to do some preliminary troubleshooting.
 
 ```bash
-# Test 2: Make the robot move visually  
+# Test 2/3: Make the robot move visually  
 python scripts/visual_test.py
+# There is a 3rd testing file, but that is only for physical robots.
 ```
-**What this does**: Moves the robot slowly so you can see it moving in the simulator web interface
+**What this does**: Moves the robot around slowly so you can see it moving in the simulator web interface. 
+refer to output in terminal to see expected movements.
 
 ```bash
-# Test 3: Run basic examples
+# Test 3/3: Run full examples
 python examples/basic_example.py
+# There are 3 example files in total here, all of which are suitable for both sim or physical. 
+# Other 2 examples will be explained later.
 ```
-**What this does**: Demonstrates different types of robot movements (linear, relative, velocity control)
+**What this does**: Demonstrates advanced types of robot actions (linear, relative, velocity control, lock)
 
-### 🤖 **Step 4: Understanding Physical Robot Connection**
+These 3 tests provide full confirmation of functionality of the simulated robot! 
+
+###  **Step 4: Understanding Physical Robot Connection**
 
 **Requirements for Physical Robots:**
 - UR robot (UR3e, UR5e, UR10e, UR16e, or UR20)

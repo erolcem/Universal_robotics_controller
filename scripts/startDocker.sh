@@ -19,7 +19,7 @@ ROBOT_MODEL="${ROBOT_MODEL:-UR5e}"
 CONTAINER_NAME="${CONTAINER_NAME:-ursim_e_series}"
 IMAGE_NAME="universalrobots/ursim_e-series"
 
-echo "🤖 Starting UR Simulator"
+echo "Starting UR Simulator"
 echo "========================"
 echo "Robot Model: $ROBOT_MODEL"
 echo "Container Name: $CONTAINER_NAME"
@@ -41,15 +41,15 @@ fi
 
 # Remove existing container if it exists
 if docker ps -aq -f name="$CONTAINER_NAME" | grep -q .; then
-    echo "🗑️  Removing existing container..."
+    echo "Removing existing container..."
     docker rm "$CONTAINER_NAME" >/dev/null 2>&1
 fi
 
 # Pull latest image if not present
-echo "📥 Checking for latest simulator image..."
+echo "Checking for latest simulator image..."
 docker pull "$IMAGE_NAME:latest"
 
-echo "🚀 Starting simulator container..."
+echo "Starting simulator container..."
 
 # Start the container
 docker run --rm -it \

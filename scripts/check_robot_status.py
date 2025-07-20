@@ -21,18 +21,18 @@ except ImportError:
 
 def check_simulator_status():
     """Check simulator connection and status."""
-    robot_ip = "127.0.0.1"
+    robot_ip = "127.0.0.1" # this is the robot IP in the simulator
     
-    print("🔍 UR Robot Diagnostic Tool")
+    print("UR Robot Diagnostic Tool")
     print("=" * 40)
     
     try:
-        print(f"🔗 Connecting to robot at {robot_ip}...")
+        print(f"Connecting to robot at {robot_ip}...")
         rtde_r = rtde_receive.RTDEReceiveInterface(robot_ip)
         
         if not rtde_r.isConnected():
             print("❌ Connection failed!")
-            print("\n🛠️  Troubleshooting steps:")
+            print("\n  Troubleshooting steps:")
             print("1. Is Docker simulator running? (./scripts/startDocker.sh)")
             print("2. Can you access http://localhost:6080/vnc.html ?")
             print("3. Try: docker ps | grep ursim")
@@ -41,7 +41,7 @@ def check_simulator_status():
         print("✅ Connection successful!")
         
         # Check robot status
-        print("\n📊 Robot Status:")
+        print("\n Robot Status:")
         print("-" * 20)
         
         # Robot mode
@@ -57,7 +57,7 @@ def check_simulator_status():
             7: "ROBOT_MODE_RUNNING",
             8: "ROBOT_MODE_UPDATING_FIRMWARE"
         }
-        print(f"🤖 Robot Mode: {mode_names.get(robot_mode, 'UNKNOWN')} ({robot_mode})")
+        print(f" Robot Mode: {mode_names.get(robot_mode, 'UNKNOWN')} ({robot_mode})")
         
         # Safety mode
         safety_mode = rtde_r.getSafetyMode()
@@ -72,11 +72,11 @@ def check_simulator_status():
             8: "VIOLATION",
             9: "FAULT"
         }
-        print(f"🛡️  Safety Mode: {safety_names.get(safety_mode, 'UNKNOWN')} ({safety_mode})")
+        print(f"  Safety Mode: {safety_names.get(safety_mode, 'UNKNOWN')} ({safety_mode})")
         
         # Current pose
         pose = rtde_r.getActualTCPPose()
-        print(f"📍 TCP Pose: {[round(p, 3) for p in pose]}")
+        print(f" TCP Pose: {[round(p, 3) for p in pose]}")
         
         # Try to get program state (different method names in different versions)
         try:
@@ -92,7 +92,7 @@ def check_simulator_status():
                 program_running = None
         
         # Analysis and recommendations
-        print("\n🎯 Analysis:")
+        print("\n Analysis:")
         print("-" * 12)
         
         if robot_mode == 1:  # CONFIRM_SAFETY
@@ -120,7 +120,7 @@ def check_simulator_status():
         
     except Exception as e:
         print(f"❌ Error: {e}")
-        print("\n🛠️  Troubleshooting steps:")
+        print("\n  Troubleshooting steps:")
         print("1. Start simulator: ./scripts/startDocker.sh")
         print("2. Wait for startup (30-60 seconds)")
         print("3. Open web interface: http://localhost:6080/vnc.html")

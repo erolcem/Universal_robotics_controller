@@ -18,8 +18,6 @@ This library lets you **control Universal Robots** (those 6-axis robot arms) usi
 - **Run command sequences**: Execute pre-programmed movement sequences from files
 - **Stay safe**: Built-in safety checks prevent dangerous movements on real robots
 
-**Perfect for**: Robotics students, researchers, automation engineers, or anyone wanting to program UR robots!
-
 ## System Requirements
 
 - **Python**: 3.8 or higher
@@ -29,6 +27,8 @@ This library lets you **control Universal Robots** (those 6-axis robot arms) usi
 - **Docker**: Required for simulation mode
 
 ## Quick Start
+
+This gets you from zero to opening the robot simulation
 
 ### 1. Installation
 
@@ -63,11 +63,12 @@ pip install -r requirements.txt
 # 5. Return to Program → Graphics
 ```
 Note: pdf located in docs can help configure the simulator with visual instructions if required.
+
 This node always remains open
 
-## 📖 Complete Guide: From Beginner to Advanced
+## Complete Guide:
 
-### 🎯 **Step 1: Understanding the Basics**
+### **Step 1: Understanding the Basics**
 
 **What is RTDE?** Real-Time Data Exchange - it's the communication protocol that lets your computer talk to UR robots.
 
@@ -75,7 +76,7 @@ This node always remains open
 - **Simulation**: Practice with a virtual robot on your computer (safe, free, no hardware needed)
 - **Physical Robot**: Control real UR robots (requires actual robot hardware and network connection)
 
-### 🎮 **Step 2: Start with Simulation (Recommended)**
+### **Step 2: Start with Simulation (Recommended)**
 
 The simulator lets you test everything safely before touching real robots.
 

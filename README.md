@@ -1,4 +1,4 @@
-# 🤖 UR Robot Controller
+# UR Robot Controller
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -6,18 +6,19 @@
 
 A comprehensive Python library for controlling Universal Robots (UR) arms through Real-Time Data Exchange (RTDE). Supports both simulation environments and physical robots with built-in safety features.
 
-## ✨ Features
+## ✨ What This Project Does
 
-- **🎯 Dual Mode Support**: Seamlessly works with UR simulator (URSim) and physical robots
-- **🛡️ Safety First**: Built-in safety checks and configurable limits for physical robot operations
-- **🎮 Flexible Control**: Position control, velocity control, and real-time streaming
-- **📁 Command Streaming**: Execute commands from JSONL files (synchronous/asynchronous modes)
-- **⚙️ Configuration Management**: YAML-based configuration for different robot setups
-- **🔧 Physical Robot Ready**: Optimized for UR3e, UR5e, UR10e, UR16e, and UR20 models
-- **📊 Comprehensive Logging**: Detailed logging for debugging and monitoring
-- **🔍 Diagnostic Tools**: Built-in status checking and troubleshooting utilities
+This library lets you **control Universal Robots** (those 6-axis robot arms) using Python code. You can:
 
-## 📋 System Requirements
+- **🎮 Control robot movements**: Make the robot move to specific positions, follow paths, or apply forces
+- **💻 Work with simulation**: Practice and test your code safely using a virtual robot
+- **🤖 Connect to real robots**: Control actual UR robots in factories, labs, or workshops  
+- **📁 Run command sequences**: Execute pre-programmed movement sequences from files
+- **🛡️ Stay safe**: Built-in safety checks prevent dangerous movements on real robots
+
+**Perfect for**: Robotics students, researchers, automation engineers, or anyone wanting to program UR robots!
+
+## System Requirements
 
 - **Python**: 3.8 or higher
 - **Operating System**: Linux (Ubuntu 20.04+), Windows 10/11, macOS 10.15+
@@ -25,14 +26,14 @@ A comprehensive Python library for controlling Universal Robots (UR) arms throug
 - **Network**: Ethernet connection to robot (for physical robots)
 - **Docker**: Required for simulation mode
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ur-robot-controller.git
-cd ur-robot-controller
+git clone https://github.com/erolcem/ursim_pipeline.git
+cd ursim_pipeline
 
 # Create and activate virtual environment
 python3 -m venv ur_venv
@@ -59,173 +60,435 @@ pip install -r requirements.txt
 # 4. Go to Move → Press "ON" → Press "START"
 # 5. Return to Program → Graphics
 ```
+Note: pdf located in docs can help configure the simulator with visual instructions if required.
+This node always remains open
 
-### 3. Run Your First Example
+## 📖 Complete Guide: From Beginner to Advanced
+
+### 🎯 **Step 1: Understanding the Basics**
+
+**What is RTDE?** Real-Time Data Exchange - it's the communication protocol that lets your computer talk to UR robots.
+
+**Simulation vs Physical Robot:**
+- **Simulation**: Practice with a virtual robot on your computer (safe, free, no hardware needed)
+- **Physical Robot**: Control real UR robots (requires actual robot hardware and network connection)
+
+### 🎮 **Step 2: Start with Simulation (Recommended)**
+
+The simulator lets you test everything safely before touching real robots.
 
 ```bash
-# Activate virtual environment
+# Run this to start the virtual robot
+./scripts/startDocker.sh
+```
+**What this does**: Downloads and starts a virtual UR robot that runs in Docker
+
+```bash
+# Open this website to see your virtual robot
+# Navigate to: http://localhost:6080/vnc.html
+```
+**What you'll see**: A web-based interface showing a 3D robot that you can control
+
+**One-time setup in simulator:**
+1. Click "Confirm Safety Configuration" (acknowledges you understand robot safety)
+2. Turn ON "Simulation" switch (bottom right - enables simulation mode)
+3. Go to Program → Graphics (shows the robot visually)
+4. Go to Move → Press "ON" → Press "START" (starts the robot program)
+5. Return to Program → Graphics (go back to visual view)
+
+Note: PDF in `docs/` folder has visual instructions if needed. Keep this simulator window open!
+
+### 🧪 **Step 3: Test Your Setup**
+
+Open a **new terminal** (keep simulator running) and test these commands:
+
+```bash
+# Activate your Python environment
 source ur_venv/bin/activate
 
-# Test basic functionality
-python examples/basic_example.py
-
-# Check robot status
+# Test 1: Check if robot is ready
 python scripts/check_robot_status.py
-
-# Visual movement test
-python scripts/visual_test.py
 ```
-
-## 📖 Usage Examples
-
-### Basic Robot Control
-
-```python
-from src.ur_controller import URRobotController
-
-# Initialize controller
-controller = URRobotController(
-    robot_ip="127.0.0.1",      # Simulator IP
-    robot_type="simulation"     # or "physical"
-)
-
-# Connect and control
-if controller.connect():
-    # Get current position
-    pose = controller.get_tcp_pose()
-    print(f"Current pose: {pose}")
-    
-    # Move to new position (relative movement)
-    controller.move_linear_relative([0.1, 0, 0], speed=0.1)  # Move 10cm in X
-    
-    # Move to absolute position
-    target = [0.3, -0.3, 0.5, 0.0, 3.14, 0.0]
-    controller.move_linear(target, speed=0.1)
-    
-    # Velocity control
-    velocity = [0.05, 0.0, 0.0, 0.0, 0.0, 0.0]  # 5cm/s in X
-    controller.move_velocity(velocity, duration=2.0)
-    
-    controller.disconnect()
-```
-
-### Physical Robot Setup
+**What this does**: Connects to robot and shows its current status (position, safety mode, etc.)
 
 ```bash
-# Scan for robots on network
+# Test 2: Make the robot move visually  
+python scripts/visual_test.py
+```
+**What this does**: Moves the robot slowly so you can see it moving in the simulator web interface
+
+```bash
+# Test 3: Run basic examples
+python examples/basic_example.py
+```
+**What this does**: Demonstrates different types of robot movements (linear, relative, velocity control)
+
+### 🤖 **Step 4: Understanding Physical Robot Connection**
+
+**Requirements for Physical Robots:**
+- UR robot (UR3e, UR5e, UR10e, UR16e, or UR20)
+- Ethernet cable connecting your computer to the robot
+- Robot must be in "Remote Control" mode
+- "External Control" URCap installed on robot
+
+**Find your robot on the network:**
+```bash
 python scripts/setup_physical_robot.py --scan
+```
+**What this does**: Scans your network to find UR robots and shows their IP addresses
+
+**Test connection to specific robot:**
+```bash
+python scripts/setup_physical_robot.py --test-ip 192.168.1.100
+```
+**What this does**: Tests if you can communicate with a robot at that IP address
+
+**Connect to physical robot:**
+```bash
+python examples/basic_example.py --robot-type physical --robot-ip 192.168.1.100
+```
+**What this does**: Runs the same examples but on a real robot instead of simulator
+
+## 🔧 **Available Scripts and What They Do**
+
+### 📁 **examples/** - Learn by doing
+```bash
+# Basic robot control (connects, moves, disconnects)
+python examples/basic_example.py
+# Shows: connection testing, linear movements, velocity control
+
+# Execute commands from a file, one by one
+python examples/synchronous_control.py --json-source examples/synchronous_deltas.jsonl  
+# Shows: how to run pre-programmed sequences step-by-step
+
+# Stream commands continuously to robot
+python examples/asynchronous_control.py --json-file examples/asynchronous_deltas.jsonl
+# Shows: real-time control, continuous movement streaming
+```
+
+### 🛠️ **scripts/** - Diagnostic and setup tools
+```bash
+# Check if robot is working and ready
+python scripts/check_robot_status.py
+# Shows: connection status, robot mode, safety status, current position
+
+# Visual test - see robot move slowly
+python scripts/visual_test.py  
+# Shows: slow movements you can watch in simulator interface
+
+# Find physical robots on your network
+python scripts/setup_physical_robot.py --scan
+# Shows: IP addresses of UR robots found on network
 
 # Test connection to specific robot
 python scripts/setup_physical_robot.py --test-ip 192.168.1.100
+# Shows: whether you can connect to robot at that IP
 
-# Run example with physical robot
-python examples/basic_example.py --robot-type physical --robot-ip 192.168.1.100
+# Start the robot simulator
+./scripts/startDocker.sh
+# Shows: starts virtual robot environment in Docker
 ```
 
-### Command File Execution
+### 📂 **legacy/** - Original working examples
+```bash
+# Your original working scripts (preserved for reference)
+python legacy/ur_example.py          # Basic UR robot examples
+python legacy/ur_synchronous.py      # Sequential command execution  
+python legacy/ur_asynchronous.py     # Streaming command execution
+```
 
-Create command files in JSONL format:
+## 💡 **How to Write Your Own Robot Code**
+
+Instead of starting from scratch, you can use this library in your own Python programs:
+
+```python
+# This is example code you can copy and modify
+from src.ur_controller import URRobotController
+
+# Connect to robot (simulator or physical)
+robot = URRobotController(
+    robot_ip="127.0.0.1",        # Use 127.0.0.1 for simulator
+    robot_type="simulation"       # Use "physical" for real robots
+)
+
+if robot.connect():
+    print("Robot connected!")
+    
+    # Get where robot currently is
+    current_position = robot.get_tcp_pose()
+    print(f"Robot is at: {current_position}")
+    
+    # Move robot 10cm to the right
+    robot.move_linear_relative([0.1, 0, 0], speed=0.1)
+    
+    robot.disconnect()
+else:
+    print("Could not connect to robot")
+```
+
+**Why use this approach?** This library handles all the complex communication with the robot, so you can focus on what you want the robot to do, not how to talk to it.
+
+## 📋 **Command Files: Pre-Programming Robot Movements**
+
+You can create files with robot movements and run them later:
+
+**Create a file called `my_movements.jsonl`:**
 ```json
 {"dx": 0.05, "dy": 0.0, "dz": 0.0}
-{"dx": 0.0, "dy": 0.05, "dz": 0.0}
-{"dx": 0.0, "dy": 0.0, "dz": 0.05, "drx": 0.1}
+{"dx": 0.0, "dy": 0.05, "dz": 0.0}  
+{"dx": 0.0, "dy": 0.0, "dz": 0.05}
 ```
 
-Execute commands:
+**Run the movements:**
 ```bash
-# Synchronous execution (waits for each command to complete)
-python examples/synchronous_control.py --json-source examples/synchronous_deltas.jsonl
-
-# Asynchronous execution (continuous streaming)
-python examples/asynchronous_control.py --json-file examples/asynchronous_deltas.jsonl
+python examples/synchronous_control.py --json-source my_movements.jsonl
 ```
 
-### Configuration-Based Control
+**What each line means:**
+- `dx, dy, dz`: Move in X, Y, Z directions (in meters)
+- `drx, dry, drz`: Rotate around X, Y, Z axes (in radians)
 
-Create a robot configuration file (`config/my_robot.yaml`):
+## ⚙️ **Configuration Files: Save Robot Settings**
+
+Create `my_robot_config.yaml` to save settings:
 ```yaml
 robot:
-  type: "physical"
-  ip: "192.168.1.100"
-  model: "UR10e"
-  frequency: 500.0
-
-physical:
-  safety:
-    max_velocity: 0.5
-    max_acceleration: 1.0
-    workspace_limits:
-      x: [-1.3, 1.3]
-      y: [-1.3, 1.3]
-      z: [0.0, 1.9]
+  type: "physical"           # or "simulation"  
+  ip: "192.168.1.100"       # your robot's IP address
+  model: "UR10e"            # your robot model
 
 movement:
-  default_speed: 0.1
-  default_acceleration: 0.3
+  default_speed: 0.1        # how fast robot moves (m/s)
+  default_acceleration: 0.3 # how quickly it speeds up (m/s²)
 ```
 
-Use with any script:
+**Use your config:**
 ```bash
-python examples/basic_example.py --config config/my_robot.yaml
+python examples/basic_example.py --config my_robot_config.yaml
 ```
 
-## 📁 Project Structure
+## 📁 **Project Files Explained**
+
+### 🔍 **What Each File/Folder Does**
 
 ```
 ur-robot-controller/
 ├── 📂 src/
-│   └── ur_controller.py              # Main library
-├── 📂 examples/
-│   ├── basic_example.py              # Basic robot control demo
-│   ├── synchronous_control.py        # Sequential command execution
-│   ├── asynchronous_control.py       # Streaming command execution
-│   ├── synchronous_deltas.jsonl      # Example commands (sync)
-│   └── asynchronous_deltas.jsonl     # Example commands (async)
-├── 📂 scripts/
-│   ├── startDocker.sh                # Start UR simulator
-│   ├── setup_physical_robot.py       # Physical robot setup tool
-│   ├── check_robot_status.py         # Robot diagnostics
-│   └── visual_test.py                # Visual movement verification
+│   └── ur_controller.py              # Main library - the "brain" that talks to robots
+├── 📂 examples/                      # Example scripts you can run and learn from
+│   ├── basic_example.py              # ➤ python examples/basic_example.py
+│   ├── synchronous_control.py        # ➤ python examples/synchronous_control.py --json-source file.jsonl
+│   ├── asynchronous_control.py       # ➤ python examples/asynchronous_control.py --json-file file.jsonl
+│   ├── synchronous_deltas.jsonl      # Example movement commands (step-by-step)
+│   └── asynchronous_deltas.jsonl     # Example movement commands (continuous)
+├── 📂 scripts/                       # Utility tools for setup and diagnostics
+│   ├── startDocker.sh                # ➤ ./scripts/startDocker.sh (starts simulator)
+│   ├── setup_physical_robot.py       # ➤ python scripts/setup_physical_robot.py --scan
+│   ├── check_robot_status.py         # ➤ python scripts/check_robot_status.py
+│   └── visual_test.py                # ➤ python scripts/visual_test.py
 ├── 📂 config/
-│   └── robot_config_template.yaml    # Configuration template
-├── 📂 legacy/
-│   ├── ur_example.py                 # Original working examples
-│   ├── ur_synchronous.py             # Legacy sync control
-│   └── ur_asynchronous.py            # Legacy async control
+│   └── robot_config_template.yaml    # Template for robot settings (copy and modify)
+├── 📂 legacy/                        # Your original working scripts (preserved)
+│   ├── ur_example.py                 # ➤ python legacy/ur_example.py
+│   ├── ur_synchronous.py             # ➤ python legacy/ur_synchronous.py  
+│   └── ur_asynchronous.py            # ➤ python legacy/ur_asynchronous.py
 ├── 📂 docs/
-│   └── Documentation_Arm_simulationv1.pdf
-├── requirements.txt                  # Python dependencies
-├── setup.py                         # Package setup
-├── .gitignore                       # Git ignore rules
-├── LICENSE                          # MIT license
-└── README.md                        # This file
+│   └── Documentation_Arm_simulationv1.pdf  # Visual guide for simulator setup
+├── requirements.txt                  # List of Python packages needed
+├── setup.py                         # Makes this into a proper Python package
+├── .gitignore                       # Tells Git what files to ignore
+├── LICENSE                          # MIT license (free to use)
+└── README.md                        # This guide you're reading
 ```
 
-## 🛠️ API Reference
+### 🤔 **What is setup.py?**
 
-### URRobotController Class
+`setup.py` is a special file that makes this project into a **proper Python package**. Think of it like creating an "installer" for your code.
 
-| Method | Description | Parameters |
-|--------|-------------|------------|
-| `connect()` | Connect to robot | Returns: `bool` |
-| `disconnect()` | Disconnect from robot | None |
-| `get_tcp_pose()` | Get current TCP position | Returns: `List[float]` |
-| `move_linear(pose, speed, acceleration)` | Move to absolute pose | `pose`: target pose, `speed`: m/s, `acceleration`: m/s² |
-| `move_linear_relative(delta, speed)` | Move relative to current pose | `delta`: [dx,dy,dz,drx,dry,drz], `speed`: m/s |
-| `move_velocity(velocity, duration)` | Apply velocity for duration | `velocity`: [vx,vy,vz,vrx,vry,vrz], `duration`: seconds |
-| `stop_movement()` | Emergency stop | None |
+**What it does:**
+- Lets you install this robot controller as a system-wide Python package
+- Makes it easy to share your code with others
+- Handles dependencies automatically
+- Creates command-line tools
 
-### Command File Format
+**How to use it:**
+```bash
+# Install this package system-wide (optional)
+pip install -e .
 
-Commands use JSONL format (one JSON object per line):
-```json
-{"dx": 0.05, "dy": 0.0, "dz": 0.0}                    // Linear movement
-{"dx": 0.0, "dy": 0.0, "dz": 0.0, "drx": 0.1}        // Rotational movement
-{"dx": 0.02, "dy": 0.02, "dz": 0.01, "dry": 0.05}    // Combined movement
+# After installing, you can use it from anywhere:
+python -c "from src.ur_controller import URRobotController; print('Package installed!')"
 ```
 
-- `dx`, `dy`, `dz`: Linear deltas in meters
-- `drx`, `dry`, `drz`: Rotational deltas in radians
+**Do you need it?** No! You can use everything without running setup.py. It's just for advanced users who want to install the package properly.
+
+## 🤖 **Complete Physical Robot Setup Guide**
+
+### 📋 **Prerequisites**
+- UR robot (UR3e, UR5e, UR10e, UR16e, or UR20)
+- Ethernet cable
+- Computer connected to same network as robot
+- Robot powered on and safety configured
+
+### 🔌 **Step 1: Physical Connection**
+
+**Option A: Direct Connection**
+1. Connect ethernet cable from your computer directly to robot's ethernet port
+2. Set your computer's IP to `192.168.1.XXX` (where XXX is 1-254, but not 100)
+3. Robot will typically be at `192.168.1.100`
+
+**Option B: Network Connection**
+1. Connect robot to your local network via ethernet
+2. Robot will get IP address from your router (check robot's teach pendant for IP)
+3. Your computer must be on same network
+
+### 🖥️ **Step 2: Robot Configuration**
+
+**On the robot's teach pendant:**
+1. Go to **Settings** → **System** → **Network**
+2. Note the IP address (e.g., `192.168.1.100`)
+3. Go to **Settings** → **Features** → **External Control**
+4. Install **External Control URCap** if not already installed
+5. Create a simple program:
+   ```
+   BeforeStart:
+   1. External Control (localhost, 50002)
+   
+   Robot Program:
+   1. External Control (localhost, 50002) 
+   ```
+6. Save this program as "External_Control"
+
+### 🔍 **Step 3: Test Connection**
+
+```bash
+# Find your robot on the network
+python scripts/setup_physical_robot.py --scan
+```
+**Expected output:**
+```
+🔍 Scanning for UR robots...
+Found robot at: 192.168.1.100 (UR10e)
+```
+
+```bash
+# Test specific robot connection
+python scripts/setup_physical_robot.py --test-ip 192.168.1.100
+```
+**Expected output:**
+```
+✅ Connection successful to 192.168.1.100
+✅ Robot mode: RUNNING
+✅ Safety mode: NORMAL
+```
+
+### 🎮 **Step 4: Control Physical Robot**
+
+```bash
+# Run basic example with physical robot
+python examples/basic_example.py --robot-type physical --robot-ip 192.168.1.100
+```
+
+**⚠️ SAFETY NOTES:**
+- Always have emergency stop button ready
+- Start with slow movements (speed=0.05)
+- Keep clear of robot workspace
+- Ensure robot workspace is free of obstacles
+- Test in manual mode first
+
+### 🛠️ **Troubleshooting Physical Connections**
+
+**Can't find robot:**
+```bash
+# Check network connectivity
+ping 192.168.1.100
+
+# Check if robot ports are open
+telnet 192.168.1.100 29999
+```
+
+**Robot not responding:**
+1. Check robot is in **Remote Control** mode (teach pendant)
+2. Verify **External Control** program is running
+3. Check firewall settings on your computer
+4. Ensure robot safety system is normal (no protective stops)
+
+**Connection timeout:**
+- Robot might be in wrong mode
+- External Control URCap not properly configured
+- Network issues (firewall, wrong IP)
+
+### 📋 **Physical Robot Checklist**
+
+Before running any script with physical robot:
+
+- [ ] Robot is powered on and initialized
+- [ ] Safety system shows normal status  
+- [ ] Robot is in "Remote Control" mode
+- [ ] External Control URCap is installed
+- [ ] External Control program is loaded and running
+- [ ] Network connection is established
+- [ ] Emergency stop is accessible
+- [ ] Workspace is clear of people and obstacles
+- [ ] You've tested with simulator first
+
+### 🔧 **Advanced: Custom Robot Configuration**
+
+Create `my_physical_robot.yaml`:
+```yaml
+robot:
+  type: "physical"
+  ip: "192.168.1.100"  # Your robot's IP
+  model: "UR10e"       # Your robot model
+  frequency: 500.0
+
+physical:
+  safety:
+    max_velocity: 0.2        # Slower for safety
+    max_acceleration: 0.5    # Gentle acceleration
+    workspace_limits:        # Define safe workspace
+      x: [-0.8, 0.8]        # X limits in meters
+      y: [-0.8, 0.8]        # Y limits in meters  
+      z: [0.1, 1.5]         # Z limits in meters
+
+movement:
+  default_speed: 0.05       # Start slow!
+  default_acceleration: 0.1
+```
+
+Use with any script:
+```bash
+python examples/basic_example.py --config my_physical_robot.yaml
+```
+
+## 🛠️ **Programming Reference (API)**
+
+### URRobotController Class - Main Functions
+
+| Function | What It Does | How To Use |
+|----------|--------------|------------|
+| `connect()` | Connect to robot | `robot.connect()` → Returns `True` if successful |
+| `disconnect()` | Disconnect from robot | `robot.disconnect()` |
+| `get_tcp_pose()` | Get robot's current position | `pose = robot.get_tcp_pose()` → Returns `[x,y,z,rx,ry,rz]` |
+| `move_linear(pose, speed)` | Move to exact position | `robot.move_linear([0.3,-0.3,0.5,0,3.14,0], 0.1)` |
+| `move_linear_relative(delta, speed)` | Move relative to current position | `robot.move_linear_relative([0.1,0,0], 0.1)` |
+| `move_velocity(velocity, duration)` | Apply velocity for time period | `robot.move_velocity([0.05,0,0,0,0,0], 2.0)` |
+| `stop_movement()` | Emergency stop | `robot.stop_movement()` |
+
+### 📏 **Understanding Coordinates**
+
+**Position format:** `[x, y, z, rx, ry, rz]`
+- `x, y, z`: Position in meters (+ = right, forward, up)
+- `rx, ry, rz`: Rotation in radians around each axis
+
+**Example positions:**
+```python
+# 30cm right, 40cm back, 50cm up from robot base
+position = [0.3, -0.4, 0.5, 0.0, 3.14, 0.0]
+
+# Move 10cm to the right from current position  
+relative_move = [0.1, 0.0, 0.0, 0.0, 0.0, 0.0]
+```
 
 ## 🛡️ Safety Features
 
@@ -314,23 +577,72 @@ pip install -r requirements.txt
 | Safety violation | Movement outside limits | Check workspace configuration |
 | Robot not ready | Wrong robot mode | Set robot to remote control mode |
 
-## 🧪 Testing
+## 🧪 **Testing Your Setup (Step by Step)**
 
-Run the test suite to verify installation:
+### 🎯 **Quick Tests to Verify Everything Works**
 
+**Test 1: Basic Connection**
 ```bash
-# Activate environment
 source ur_venv/bin/activate
-
-# Basic connection test
 python scripts/check_robot_status.py
+```
+**What you should see:**
+```
+✅ Connection successful!
+🤖 Robot Mode: ROBOT_MODE_RUNNING (7)
+🛡️ Safety Mode: NORMAL (1)
+📍 TCP Pose: [-0.144, -0.436, 0.202, -0.001, 3.116, 0.039]
+✅ Robot is ready for control!
+```
+**If it fails:** Check simulator is running, or robot IP is correct
 
-# Visual movement test (with simulator open)
+**Test 2: Visual Movement**
+```bash
 python scripts/visual_test.py
+```
+**What you should see:** Robot moving slowly in simulator interface, with output like:
+```
+🔄 Move UP 10cm...
+✅ Movement completed
+🔄 Move DOWN to start...
+✅ Movement completed
+```
+**If it fails:** Robot might not be in correct mode, check simulator configuration
 
-# Full functionality test
+**Test 3: Full Functionality**
+```bash
 python examples/basic_example.py
 ```
+**What you should see:**
+```
+✅ Connection successful!
+📍 Current TCP pose: [-0.144, -0.436, 0.202, ...]
+🔄 Moving +10cm in X...
+✅ Movement completed
+✅ All tests completed successfully!
+```
+**If it fails:** Check previous tests passed first
+
+### 🔧 **Advanced Tests**
+
+**Test Pre-programmed Sequences:**
+```bash
+python examples/synchronous_control.py --json-source examples/synchronous_deltas.jsonl
+```
+**What this tests:** File-based command execution
+
+**Test Real-time Streaming:**
+```bash  
+python examples/asynchronous_control.py --json-file examples/asynchronous_deltas.jsonl
+```
+**What this tests:** Continuous command streaming
+
+**Test Physical Robot (if available):**
+```bash
+python scripts/setup_physical_robot.py --scan
+python examples/basic_example.py --robot-type physical --robot-ip YOUR_ROBOT_IP
+```
+**What this tests:** Real robot connection and control
 
 ## 🚀 Future Development: ROS 2 Integration
 
@@ -356,13 +668,25 @@ We welcome contributions! Please follow these steps:
 ### Development Setup
 ```bash
 # Clone your fork
-git clone https://github.com/yourusername/ur-robot-controller.git
-cd ur-robot-controller
+git clone https://github.com/yourusername/ursim_pipeline.git
+cd ursim_pipeline
 
 # Install development dependencies
 pip install -r requirements.txt
 # pip install pytest black flake8  # Optional dev tools
 ```
+
+---
+
+## 📚 **Quick Navigation**
+
+- [🎯 What This Project Does](#-what-this-project-does) - Understanding the basics
+- [🚀 Quick Start](#-quick-start) - Get running in 5 minutes  
+- [📖 Complete Guide](#-complete-guide-from-beginner-to-advanced) - Step-by-step tutorial
+- [🔧 Available Scripts](#-available-scripts-and-what-they-do) - All commands explained
+- [🤖 Physical Robot Setup](#-complete-physical-robot-setup-guide) - Connect to real robots
+- [🧪 Testing](#-testing-your-setup-step-by-step) - Verify everything works
+- [🛠️ Programming Reference](#-programming-reference-api) - Code examples and API
 
 ## 📄 License
 
@@ -377,10 +701,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- 📖 **Documentation**: Check this README and the examples
-- 🐛 **Issues**: [Open an issue](https://github.com/yourusername/ur-robot-controller/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/ur-robot-controller/discussions)
-- 📧 **Email**: your.email@example.com
+- 📖 **Documentation**: Check this README and run the examples
+- 🐛 **Issues**: [Open an issue](https://github.com/erolcem/ursim_pipeline/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/erolcem/ursim_pipeline/discussions)
+- 📧 **Email**: Contact the repository owner
 
 ## 🏷️ Version History
 
@@ -394,6 +718,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **⭐ Star this repository if it helped you! ⭐**
 
-[🔗 View on GitHub](https://github.com/yourusername/ur-robot-controller) | [📋 Report Bug](https://github.com/yourusername/ur-robot-controller/issues) | [💡 Request Feature](https://github.com/yourusername/ur-robot-controller/issues)
+[🔗 View on GitHub](https://github.com/erolcem/ursim_pipeline) | [📋 Report Bug](https://github.com/erolcem/ursim_pipeline/issues) | [💡 Request Feature](https://github.com/erolcem/ursim_pipeline/issues)
 
 </div>

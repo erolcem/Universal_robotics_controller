@@ -8,53 +8,80 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
+"""
+UR Robot Controller Setup
+A comprehensive Python library for controlling Universal Robots through RTDE.
+"""
+
+from setuptools import setup, find_packages
+from pathlib import Path
+
+# Read the README file
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
+
+# Read requirements
+requirements = []
+with open('requirements.txt') as f:
+    for line in f:
+        line = line.strip()
+        if line and not line.startswith('#'):
+            requirements.append(line)
+
 setup(
     name="ur-robot-controller",
     version="1.0.0",
     author="Your Name",
     author_email="your.email@example.com",
-    description="Python library for controlling Universal Robots arms via RTDE",
+    description="A comprehensive Python library for controlling Universal Robots through RTDE",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/yourusername/ur-robot-controller",
+    project_urls={
+        "Bug Tracker": "https://github.com/yourusername/ur-robot-controller/issues",
+        "Documentation": "https://github.com/yourusername/ur-robot-controller#readme",
+        "Source Code": "https://github.com/yourusername/ur-robot-controller",
+    },
     packages=find_packages(),
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
-        "Topic :: Scientific/Engineering :: Interface Engine/Protocol Translators",
-        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Programming Language :: Python :: 3.12",
+        "Operating System :: OS Independent",
     ],
     python_requires=">=3.8",
-    install_requires=[
-        "ur-rtde>=1.6.0",
-        "PyYAML>=6.0",
-        "numpy>=1.26.0",
-    ],
+    install_requires=requirements,
     extras_require={
         "dev": [
-            "pytest>=7.4.0",
-            "flake8>=7.0.0",
-            "black",
-            "isort",
+            "pytest>=7.0.0",
+            "black>=22.0.0",
+            "flake8>=4.0.0",
+            "mypy>=0.950",
         ],
-        "visualization": [
-            "matplotlib>=3.6.0",
+        "docs": [
+            "sphinx>=4.0.0",
+            "sphinx-rtd-theme>=1.0.0",
         ],
     },
     entry_points={
         "console_scripts": [
-            "ur-setup-physical=scripts.setup_physical_robot:main",
+            "ur-check-status=scripts.check_robot_status:main",
+            "ur-visual-test=scripts.visual_test:main",
         ],
     },
     include_package_data=True,
     package_data={
-        "": ["*.yaml", "*.jsonl", "*.md"],
+        "": ["*.yaml", "*.yml", "*.json", "*.jsonl", "*.md"],
     },
+    keywords="robotics universal-robots ur rtde control automation",
+    zip_safe=False,
 )

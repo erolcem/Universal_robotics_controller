@@ -8,17 +8,22 @@ A comprehensive Python library for controlling Universal Robots (UR) arms throug
 
 ![RobotArm](images/ursim_pipeline_1.png)
 
-## What This Project Does
+## Project Function
 
-This library lets you **control Universal Robots** (those 6-axis robot arms) using Python code. You can:
+This library lets you **control Universal Robots** (6-axis robot arms) using Python code. You can:
 
 - **Control robot movements**: Make the robot move to specific positions, follow paths, or apply forces
 - **Work with simulation**: Practice and test your code safely using a virtual robot
-- **Connect to real robots**: Control actual UR robots in factories, labs, or workshops  
-- **Run command sequences**: Execute pre-programmed movement sequences from files
-- **Stay safe**: Built-in safety checks prevent dangerous movements on real robots
+- **Connect to real robots**: Control actual UR robots in labs
+- **Run command sequences**: Execute pre-programmed or streaming movement sequences from files
+- **Stay safe**: Built-in safety checks prevent dangerous or impossible movements on robots
 
-## System Requirements
+## Installation
+
+### 1. System requirements
+
+Please make sure you have the following ready, notably, python and docker.
+Which can be found on their respective websites.
 
 - **Python**: 3.8 or higher
 - **Operating System**: Linux (Ubuntu 20.04+), Windows 10/11, macOS 10.15+
@@ -26,45 +31,22 @@ This library lets you **control Universal Robots** (those 6-axis robot arms) usi
 - **Network**: Ethernet connection to robot (for physical robots)
 - **Docker**: Required for simulation mode
 
-## Quick Start
+### 2. Environment setup
 
-This gets you from zero to opening the robot simulation
-
-### 1. Installation
+Simply clone and in the virtual environment, install dependencies, which can be found in requirements.txt
 
 ```bash
 # Clone the repository
-git clone https://github.com/erolcem/ursim_pipeline.git
-cd ursim_pipeline
+git clone https://github.com/erolcem/Universal_robotics_controller.git
+cd Universal_robotics_controller
 
-# Create and activate virtual environment
+# Create and activate virtual environment (this example is for linux)
 python3 -m venv ur_venv
 source ur_venv/bin/activate  # On Windows: ur_venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 ```
-
-### 2. Simulation Setup
-
-```bash
-# Install Docker Desktop from https://docker.com
-# Start the UR simulator
-./scripts/startDocker.sh
-
-# Open simulator web interface
-# Navigate to: http://localhost:6080/vnc.html
-
-# Configure simulator (one-time setup):
-# 1. Click "Confirm Safety Configuration"
-# 2. Turn ON "Simulation" (bottom right switch)
-# 3. Go to Program → Graphics
-# 4. Go to Move → Press "ON" → Press "START"
-# 5. Return to Program → Graphics
-```
-Note: pdf located in docs can help configure the simulator with visual instructions if required.
-
-This node always remains open
 
 ## Complete Guide:
 

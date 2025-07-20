@@ -46,7 +46,7 @@ Thumbs.db
 
 # Logs
 *.log
-*.jsonl
+#*.jsonl
 logs/
 
 # Configuration (keep templates, ignore actual config files)

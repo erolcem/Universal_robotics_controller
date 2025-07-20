@@ -1,4 +1,4 @@
-# 🤖 UR Robot Controller
+# UR Robot Controller
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -6,21 +6,23 @@
 
 A comprehensive Python library for controlling Universal Robots (UR) arms through Real-Time Data Exchange (RTDE). Supports both simulation environments and physical robots with built-in safety features.
 
-## ✨ What This Project Does
+![RobotArm](images/ursim_pipeline_1.png)
+
+## What This Project Does
 
 This library lets you **control Universal Robots** (6-axis robot arms) using Python code. You can:
 
-- **🎮 Control robot movements**: Make the robot move to specific positions, follow paths, or apply forces
-- **💻 Work with simulation**: Practice and test your code safely using a virtual robot
-- **🤖 Connect to real robots**: Control actual UR robots in labs, factories, or workshops
-- **📁 Run command sequences**: Execute pre-programmed or streaming movement sequences from files
-- **🛡️ Stay safe**: Built-in safety checks prevent dangerous or impossible movements on robots
+- **Control robot movements**: Make the robot move to specific positions, follow paths, or apply forces
+- **Work with simulation**: Practice and test your code safely using a virtual robot
+- **Connect to real robots**: Control actual UR robots in labs, factories, or workshops
+- **Run command sequences**: Execute pre-programmed or streaming movement sequences from files
+- **Stay safe**: Built-in safety checks prevent dangerous or impossible movements on robots
 
 **Perfect for**: Robotics students, researchers, automation engineers, or anyone wanting to program UR robots!
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### System Requirements
 - **Python**: 3.8 or higher
@@ -45,9 +47,9 @@ pip install -r requirements.txt
 
 ---
 
-## ⚙️ Configuration: Setup Your Robot Settings
+##  Configuration: Setup Your Robot Settings
 
-**🎯 IMPORTANT**: Set up your robot configuration first! This makes all scripts work without extra arguments.
+**IMPORTANT**: Set up your robot configuration first! This makes all scripts work without extra arguments.
 
 ### Create Your Robot Configuration
 
@@ -117,7 +119,7 @@ python examples/asynchronous_control.py --json-file examples/asynchronous_deltas
 
 ---
 
-## 🎮 Simulation Setup
+## Simulation Setup
 
 ### Start the Virtual Robot
 ```bash
@@ -151,7 +153,7 @@ python scripts/visual_test.py
 
 ---
 
-## 🤖 Physical Robot Setup
+## Physical Robot Setup
 
 ### Hardware Requirements
 - UR robot (UR3e, UR5e, UR10e, UR16e, or UR20)
@@ -227,7 +229,7 @@ robot:
 
 ---
 
-## 🧪 Testing Your Setup
+## Testing Your Setup
 
 ### Test 1: Connection Status
 ```bash

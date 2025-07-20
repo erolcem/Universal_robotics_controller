@@ -6,15 +6,17 @@
 
 A comprehensive Python library for controlling Universal Robots (UR) arms through Real-Time Data Exchange (RTDE). Supports both simulation environments and physical robots with built-in safety features.
 
-## ✨ What This Project Does
+![RobotArm](images/ursim_pipeline_1.png)
+
+## What This Project Does
 
 This library lets you **control Universal Robots** (those 6-axis robot arms) using Python code. You can:
 
-- **🎮 Control robot movements**: Make the robot move to specific positions, follow paths, or apply forces
-- **💻 Work with simulation**: Practice and test your code safely using a virtual robot
-- **🤖 Connect to real robots**: Control actual UR robots in factories, labs, or workshops  
-- **📁 Run command sequences**: Execute pre-programmed movement sequences from files
-- **🛡️ Stay safe**: Built-in safety checks prevent dangerous movements on real robots
+- **Control robot movements**: Make the robot move to specific positions, follow paths, or apply forces
+- **Work with simulation**: Practice and test your code safely using a virtual robot
+- **Connect to real robots**: Control actual UR robots in factories, labs, or workshops  
+- **Run command sequences**: Execute pre-programmed movement sequences from files
+- **Stay safe**: Built-in safety checks prevent dangerous movements on real robots
 
 **Perfect for**: Robotics students, researchers, automation engineers, or anyone wanting to program UR robots!
 

@@ -398,6 +398,128 @@ class URCommandProcessor:
         except KeyboardInterrupt:
             self.logger.info("Interrupted by user")
     
+    def process_synchronous_poses(self, json_file: str, log_file: Optional[str] = None,
+                                 responsiveness: float = 1.0) -> None:
+        """
+        Process absolute pose commands from JSON file synchronously.
+        
+        Args:
+            json_file: Path to JSONL file with pose commands
+            log_file: Optional log file path
+            responsiveness: Time between commands in seconds
+        """
+        if not self.controller.is_connected():
+            self.logger.error("Robot not connected")
+            return
+        
+        log_f = None
+        if log_file:
+            log_f = open(log_file, 'a')
+        
+        try:
+            with open(json_file, 'r') as f:
+                for line_num, line in enumerate(f, 1):
+                    if not line.strip():
+                        continue
+                    
+                    try:
+                        cmd = json.loads(line)
+                        if self._execute_pose_command(cmd, log_f):
+                            time.sleep(responsiveness)
+                        else:
+                            self.logger.error(f"Failed to execute command on line {line_num}")
+                            break
+                    except json.JSONDecodeError as e:
+                        self.logger.error(f"Invalid JSON on line {line_num}: {e}")
+                        continue
+                        
+        except FileNotFoundError:
+            self.logger.error(f"Command file not found: {json_file}")
+        except KeyboardInterrupt:
+            self.logger.info("Interrupted by user")
+        finally:
+            if log_f:
+                log_f.close()
+    
+    def process_asynchronous_poses(self, json_file: str, responsiveness: float = 1.0) -> None:
+        """
+        Process absolute pose commands from JSON file asynchronously (streaming).
+        
+        Args:
+            json_file: Path to JSONL file
+            responsiveness: Time between checks in seconds
+        """
+        if not self.controller.is_connected():
+            self.logger.error("Robot not connected")
+            return
+        
+        try:
+            # Open file and seek to end
+            with open(json_file, 'r') as f:
+                f.seek(0, 2)  # Seek to end
+                
+                current_target_pose = None
+                
+                while True:
+                    # Read new lines
+                    lines = f.readlines()
+                    if lines:
+                        try:
+                            # Use the last command
+                            cmd = json.loads(lines[-1])
+                            current_target_pose = [
+                                float(cmd.get('x', 0.0)),
+                                float(cmd.get('y', 0.0)),
+                                float(cmd.get('z', 0.0)),
+                                float(cmd.get('rx', 0.0)),
+                                float(cmd.get('ry', 0.0)),
+                                float(cmd.get('rz', 0.0))
+                            ]
+                        except (json.JSONDecodeError, ValueError) as e:
+                            self.logger.error(f"Invalid command: {e}")
+                    
+                    # Move to current target pose if available
+                    if current_target_pose:
+                        self.logger.debug(f"Moving to pose: {current_target_pose}")
+                        self.controller.move_linear(current_target_pose)
+                    
+                    time.sleep(responsiveness)
+                    
+        except FileNotFoundError:
+            self.logger.error(f"Command file not found: {json_file}")
+        except KeyboardInterrupt:
+            self.logger.info("Interrupted by user")
+    
+    def _execute_pose_command(self, cmd: Dict, log_f: Optional[TextIO] = None) -> bool:
+        """Execute an absolute pose movement command."""
+        try:
+            # Extract pose values
+            x = float(cmd.get('x', 0.0))
+            y = float(cmd.get('y', 0.0))
+            z = float(cmd.get('z', 0.0))
+            rx = float(cmd.get('rx', 0.0))
+            ry = float(cmd.get('ry', 0.0))
+            rz = float(cmd.get('rz', 0.0))
+            
+            target_pose = [x, y, z, rx, ry, rz]
+            
+            # Log command
+            if log_f:
+                log_entry = {
+                    'timestamp': time.time(),
+                    'target_pose': target_pose,
+                    'command_type': 'absolute_pose'
+                }
+                log_f.write(json.dumps(log_entry) + '\n')
+                log_f.flush()
+            
+            # Execute movement
+            return self.controller.move_linear(target_pose)
+            
+        except (ValueError, KeyError) as e:
+            self.logger.error(f"Invalid command format: {e}")
+            return False
+    
     def _execute_delta_command(self, cmd: Dict, log_f: Optional[TextIO] = None) -> bool:
         """Execute a delta movement command."""
         try:

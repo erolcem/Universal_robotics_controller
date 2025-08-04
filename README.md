@@ -49,7 +49,7 @@ pip install -r requirements.txt
 
 ##  Configuration: Setup Your Robot Settings
 
-**IMPORTANT**: Set up your robot configuration first! This makes all scripts work without extra arguments.
+**IMPORTANT**: Set up your robot configuration first. This makes all scripts work without extra arguments.
 
 ### Create Your Robot Configuration
 
@@ -115,7 +115,7 @@ python examples/synchronous_control.py --json-source examples/synchronous_deltas
 python examples/asynchronous_control.py --json-file examples/asynchronous_deltas.jsonl
 ```
 
-**No more specifying `--robot-ip` or `--robot-type` every time!**
+**Thus no specifying `--robot-ip` or `--robot-type` every time**
 
 ---
 
@@ -137,7 +137,7 @@ python examples/asynchronous_control.py --json-file examples/asynchronous_deltas
    - Go to Move → Press "ON" → Press "START"
    - Return to Program → Graphics
 
-**Keep this simulator window open!** The PDF in `docs/` folder has visual instructions if needed.
+**Keep this simulator window open!** 
 
 ### Test Simulation
 ```bash
@@ -168,7 +168,7 @@ python scripts/visual_test.py
 2. Set computer's IP to `192.168.1.XXX` (where XXX is 1-254, but not 100)
 3. Robot will typically be at `192.168.1.100`
 
-**Option B: Network Connection**
+**Option B: Network Connection (UNVERIFIED)**
 1. Connect robot to your local network via ethernet
 2. Robot gets IP from your router (check robot's teach pendant for IP)
 3. Computer must be on same network
@@ -186,11 +186,9 @@ python scripts/visual_test.py
 **Create Control Program:**
 1. Create a simple program:
    ```
-   BeforeStart:
-   1. External Control (localhost, 50002)
    
    Robot Program:
-   1. External Control (localhost, 50002) 
+   1. External Control (<pc ethernet id>, 50002) 
    ```
 2. Save as "External_Control"
 3. Load and run this program
@@ -215,19 +213,54 @@ robot:
   # ... rest of physical robot config
 ```
 
-### Safety Checklist Before Using Physical Robot
+### Step 1: Network Configuration
+```bash
+# Verify your computer's IP
+ip route get 192.168.1.5 | grep -oP 'src \K\S+'
+# Should return: 192.168.1.155 (or your computer's IP)
+```
 
-- [ ] Robot is powered on and initialized
-- [ ] Safety system shows normal status  
-- [ ] Robot is in "Remote Control" mode
-- [ ] External Control URCap is installed and running
-- [ ] Network connection is established
-- [ ] Emergency stop is accessible
-- [ ] Workspace is clear of people and obstacles
-- [ ] You've tested with simulator first
-- [ ] Configuration file has appropriate safety limits
+### Step 2: Robot Configuration (Critical Settings)
+**On Robot Teach Pendant:**
 
----
+1. **External Control URCap Settings:**
+   - Host IP: `192.168.1.155` (your computer's IP)
+   - Custom Port: `50002`
+   - Host Name: `192.168.1.155` (MUST match Host IP - this was key!)
+
+2. **Create External Control Program:**
+   ```
+   Program Structure:
+   └── External Control (192.168.1.155:50002)
+   ```
+   - **NO loops or waits** - just the External Control node alone
+   - **NO additional commands**
+
+### Step 3: The Working Execution Sequence
+
+**CRITICAL ORDER - This sequence is what made it work:**
+
+1. **Start Python script FIRST:**
+   ```bash
+   cd /home/erolc/Projects/ursim_pipeline
+   source ur_venv/bin/activate
+   python scripts/test_simple_movement.py
+
+### The Process (CONFIRMED WORKING)
+```bash
+# Step 1: Put robot in REMOTE mode (on teach pendant)
+
+# Step 2: Run Python script
+source ur_venv/bin/activate && python scripts/test_simple_movement.py
+
+# Step 3: External Control automatically activates!
+# ✅ Robot moves
+# ✅ Connection stays active
+# ✅ Ready for more scripts
+```
+
+
+
 
 ## Testing Your Setup
 

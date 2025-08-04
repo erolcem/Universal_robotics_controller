@@ -10,15 +10,15 @@ A comprehensive Python library for controlling Universal Robots (UR) arms throug
 
 ## What This Project Does
 
-This library lets you **control Universal Robots** (6-axis robot arms) using Python code. You can:
+This library lets you **control Universal Robots** (6-axis robot arms) using Python code. You are given 4 example scripts:
 
-- **Control robot movements**: Make the robot move to specific positions, follow paths, or apply forces
+- **Set (synchronous) pose movements**: Make the robot move to specific positions executed until all the positions are exhausted.
+- **Asynchronous (continuous) poses**: Make the robot move to a new position as the jsonl file is continuously updated.
+- **Syncronous delta movements**: Make therobot move specific distances from its current point until all movements are exhausted.
+- **Asynchronous delta movements**: Make the robot subsribe to the jsonl file continuously and move as commands enter. 
+- **Library customisation**: Allowing you to build many more scripts to meet your robot operational configurations
 - **Work with simulation**: Practice and test your code safely using a virtual robot
-- **Connect to real robots**: Control actual UR robots in labs, factories, or workshops
-- **Run command sequences**: Execute pre-programmed or streaming movement sequences from files
-- **Stay safe**: Built-in safety checks prevent dangerous or impossible movements on robots
 
-**Perfect for**: Robotics students, researchers, automation engineers, or anyone wanting to program UR robots!
 
 ---
 

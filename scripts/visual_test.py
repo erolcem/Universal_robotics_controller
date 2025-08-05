@@ -19,8 +19,8 @@ except ImportError:
 
 def visual_movement_test():
     """Perform slow, visible movements for verification."""
-    robot_ip = "127.0.0.1"
-    
+    robot_ip = "192.168.1.6" # 127.0.0.1
+
     print(" Visual Movement Test")
     print("=" * 30)
     print("Watch the robot in the simulator web interface!")

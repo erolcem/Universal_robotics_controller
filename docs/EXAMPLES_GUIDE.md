@@ -156,7 +156,7 @@ The `asynchronous_poses.jsonl` creates a more complex path suitable for streamin
 
 
 Calling:
-/home/erolc/Projects/ursim_pipeline/ur_venv/bin/python examples/synchronous_pose_control.py --robot-type physical --responsiveness 1.5
+/home/erolc/Projects/ursim_pipeline/ur_venv/bin/python examples/synchronous_pose_control.py --robot-type physical --responsiveness 3
 
 
 timeout 10s /home/erolc/Projects/ursim_pipeline/ur_venv/bin/python examples/asynchronous_pose_control.py --robot-type physical --responsiveness 2.0

@@ -3,7 +3,7 @@
 
 robot:
   type: "physical"
-  ip: "192.168.1.5"
+  ip: "192.168.1.6"
   model: "UR10e"
   frequency: 500.0
 

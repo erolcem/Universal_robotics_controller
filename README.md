@@ -1,48 +1,162 @@
-# UR Robot Controller
+# UR Robot Pipeline - Enhanced Interactive Control System
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![RTDE](https://img.shields.io/badge/RTDE-1.6+-green.svg)](https://sdurobotics.gitlab.io/ur_rtde/)
+[![UR10e Compatible](https://img.shields.io/badge/UR10e-Compatible-blue.svg)](https://www.universal-robots.com/)
 
-A comprehensive Python library for controlling Universal Robots (UR) arms through Real-Time Data Exchange (RTDE). Supports both simulation environments and physical robots with built-in safety features.
+🤖 **Advanced multi-interface robot control system** with real-time function queuing, dynamic speed control, and external program integration for Universal Robots (UR10e).
 
 ![RobotArm](images/ursim_pipeline_1.png)
 
-## What This Project Does
+## 🎯 What This System Does
 
-This library lets you **control Universal Robots** (6-axis robot arms) using Python code. You can:
+This **enhanced interactive control system** provides:
 
-- **Control robot movements**: Make the robot move to specific positions, follow paths, or apply forces
-- **Work with simulation**: Practice and test your code safely using a virtual robot
-- **Connect to real robots**: Control actual UR robots in labs, factories, or workshops
-- **Run command sequences**: Execute pre-programmed or streaming movement sequences from files
-- **Stay safe**: Built-in safety checks prevent dangerous or impossible movements on robots
+- ⚡ **Real-time Function Queuing**: Add robot functions while the robot is moving
+- 🎮 **Multi-Interface Control**: Terminal, CLI, file-based, and external program control
+- 🚀 **Dynamic Speed Control**: Base speeds + real-time speed multipliers
+- ⏸️ **Pause/Resume/Stop**: Full execution control with queue preservation
+- 🔌 **External Integration**: Control from separate programs and scripts
+- 📊 **Real-time Monitoring**: Live status updates and progress tracking
+- 🛡️ **Safety Features**: Speed limits, error handling, graceful shutdown
 
-**Perfect for**: Robotics students, researchers, automation engineers, or anyone wanting to program UR robots!
+## 📚 Documentation
+
+- **[📖 Comprehensive User Guide](README_COMPREHENSIVE.md)** - Complete documentation with examples
+- **[🚀 Quick Start Guide](docs/EXAMPLES_GUIDE.md)** - Get started in 5 minutes
+- **[📁 Legacy Documentation](docs/legacy/)** - Previous versions and setup guides
+
+**Perfect for**: Robotics students, researchers, automation engineers, or anyone wanting to program UR robots with advanced control!
 
 ---
 
-## Installation
+## 🚀 Quick Start
 
-### System Requirements
-- **Python**: 3.8 or higher
-- **Operating System**: Linux (Ubuntu 20.04+), Windows 10/11, macOS 10.15+
-- **Robot Hardware**: Universal Robots e-Series (UR3e, UR5e, UR10e, UR16e, UR20) if using physical robots
-- **Network**: Ethernet connection to robot (for physical robots)
-- **Docker**: Required for simulation mode
-
-### Environment Setup
+### 1. Setup Environment
 ```bash
 # Clone the repository
 git clone https://github.com/erolcem/ursim_pipeline.git
 cd ursim_pipeline
 
-# Create and activate virtual environment
-python3 -m venv ur_venv
-source ur_venv/bin/activate  # On Windows: ur_venv\Scripts\activate
+# Activate virtual environment (already included)
+source ur_venv/bin/activate
+```
 
-# Install dependencies
-pip install -r requirements.txt
+### 2. Start Robot Control
+```bash
+# Start the main control system
+python interactive_robot_control.py
+```
+
+### 3. Control Your Robot
+```bash
+# In the main terminal:
+list                    # See available functions
+add home               # Add home function to queue
+add pickup 0.05        # Add pickup with slow speed
+fast                   # Double the speed
+pause                  # Pause execution
+resume                 # Resume execution
+
+# From external terminal:
+python robot_cli.py status        # Check status
+python robot_cli.py add square    # Add square function
+```
+
+## 🎮 Available Functions
+
+The system includes **12 comprehensive test functions**:
+
+- **Basic**: `home`, `pickup`, `dropoff`
+- **Patterns**: `square`, `rectangle`, `circle`, `diamond`
+- **3D**: `cube_outline`, `vertical_line`, `z_oscillate`
+- **Advanced**: `pick_and_place`, `diagonal_transfer`
+
+## 🔧 Key Features
+
+### Multi-Interface Control
+- **Terminal Interface**: Direct commands in main program
+- **CLI Interface**: `python robot_cli.py <command>`
+- **File Interface**: Write to `control/robot_commands.txt`
+- **Program Interface**: Control from external Python scripts
+
+### Dynamic Speed Control
+```bash
+speed 0.1              # Set base speed
+multiplier 2.0         # Set speed multiplier
+fast                   # Double current speed
+slow                   # Halve current speed
+```
+
+### Real-time Status
+- JSON status file: `control/robot_status.json`
+- Response tracking: `control/robot_response.txt`
+- Live terminal updates
+
+---
+
+## 📖 Full Documentation
+
+👉 **[READ THE COMPREHENSIVE GUIDE](README_COMPREHENSIVE.md)** 👈
+
+The comprehensive guide includes:
+- Complete command reference
+- Function creation tutorial
+- External control examples
+- Troubleshooting guide
+- Advanced usage patterns
+- Safety guidelines
+
+---
+
+## 🛠️ System Requirements
+
+- **Python**: 3.8+ (included virtual environment ready)
+- **Robot**: UR10e or compatible Universal Robots
+- **Network**: Ethernet connection to robot controller
+- **OS**: Linux (tested), Windows, macOS
+
+## 📂 Project Structure
+
+```
+ursim_pipeline/
+├── interactive_robot_control.py    # 🎮 Main control system
+├── robot_cli.py                    # ⚡ External CLI interface  
+├── external_control_example.py     # 📝 Integration example
+├── functions/                      # 🎯 Robot function library (12 functions)
+├── control/                        # 🔌 External control interface
+├── config/                         # ⚙️ Robot configuration
+└── archive/                        # 📦 Cleaned up old files
+```
+
+## 🎉 What's New in This Version
+
+✅ **Clean Workspace**: All unused files archived  
+✅ **12 Test Functions**: Comprehensive function library  
+✅ **Multi-Interface Control**: Terminal + CLI + File + Program  
+✅ **Dynamic Speed Control**: Real-time speed adjustments  
+✅ **External Integration**: Control from other programs  
+✅ **Comprehensive Documentation**: Complete user guide  
+
+## 🤝 Contributing
+
+Contributions are welcome! Please see the comprehensive guide for development information.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+**🤖 Ready to control your robot with advanced precision! 🤖**
+
+[📖 Read Full Documentation](README_COMPREHENSIVE.md) | [🔗 View on GitHub](https://github.com/erolcem/ursim_pipeline)
+
+**⭐ Star this repository if it helped you! ⭐**
+
+</div>
 ```
 
 ---

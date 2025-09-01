@@ -1,0 +1,12 @@
+{
+  "running": true,
+  "paused": false,
+  "current_speed": 0.1,
+  "speed_multiplier": 1.0,
+  "effective_speed": 0.1,
+  "functions_executed": 5,
+  "commands_executed": 50,
+  "queue_size": 0,
+  "timestamp": 1756704544.5431285,
+  "uptime": 235.33208346366882
+}

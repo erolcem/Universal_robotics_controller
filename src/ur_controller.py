@@ -114,6 +114,10 @@ class URRobotController:
                 self.logger.error("Failed to establish RTDE connections")
                 return False
             
+            # Wait for RTDE synchronization (important for physical robots)
+            import time
+            time.sleep(2)  # Give RTDE time to fully synchronize
+            
             self.logger.info("Successfully connected to robot")
             
             # Additional checks for physical robots
@@ -298,6 +302,80 @@ class URRobotController:
         except Exception as e:
             self.logger.error(f"Emergency stop failed: {e}")
             return False
+    
+    def set_gripper(self, state: int, pin: int = 0, timeout: float = 1.0) -> bool:
+        """
+        Control gripper via tool digital output using direct socket connection.
+        This works in any robot mode (Manual/Auto).
+        
+        Args:
+            state: 1 for closed, 0 for open
+            pin: Tool digital output pin number (default: 0)
+            timeout: Maximum time to wait for command completion
+        
+        Returns:
+            True if command sent successfully
+        """
+        if state not in [0, 1]:
+            self.logger.error(f"Invalid gripper state: {state}. Use 0 (open) or 1 (closed)")
+            return False
+        
+        # Get gripper configuration
+        gripper_config = self.config.get('gripper', {})
+        gripper_pin = gripper_config.get('control_pin', pin)
+        
+        # Use direct socket connection to send URScript (works in any mode)
+        script = f"set_tool_digital_out({gripper_pin}, {bool(state)})"
+        
+        try:
+            import socket
+            
+            # Create socket connection to robot
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(timeout)
+            
+            # Connect to robot's URScript port
+            sock.connect((self.robot_ip, 30002))
+            
+            # Send URScript command
+            script_with_newline = script + "\n"
+            sock.send(script_with_newline.encode('utf-8'))
+            
+            # Close connection
+            sock.close()
+            
+            self.logger.info(f"Gripper {'closed' if state else 'opened'} (tool pin {gripper_pin}) via socket")
+            return True
+            
+        except Exception as e:
+            self.logger.warning(f"Gripper control failed: {e}")
+            return False
+    
+    def get_gripper_state(self, pin: int = 0) -> Optional[bool]:
+        """
+        Read gripper state from digital input.
+        
+        Args:
+            pin: Digital input pin number (default: 0)
+        
+        Returns:
+            True if closed, False if open, None if failed
+        """
+        if not self.rtde_r:
+            self.logger.error("Not connected to robot")
+            return None
+        
+        # Get gripper configuration
+        gripper_config = self.config.get('gripper', {})
+        feedback_pin = gripper_config.get('feedback_pin', pin)
+        
+        try:
+            state = self.rtde_r.getDigitalInState(feedback_pin)
+            self.logger.debug(f"Gripper feedback (pin {feedback_pin}): {state}")
+            return state
+        except Exception as e:
+            self.logger.error(f"Failed to read gripper state: {e}")
+            return None
 
 
 class URCommandProcessor:
@@ -519,6 +597,115 @@ class URCommandProcessor:
         except (ValueError, KeyError) as e:
             self.logger.error(f"Invalid command format: {e}")
             return False
+    
+    def _execute_pose_with_gripper_command(self, cmd: Dict, log_f: Optional[TextIO] = None, 
+                                          ignore_gripper_errors: bool = True) -> bool:
+        """Execute an absolute pose movement command with optional gripper control."""
+        try:
+            # Extract pose values
+            x = float(cmd.get('x', 0.0))
+            y = float(cmd.get('y', 0.0))
+            z = float(cmd.get('z', 0.0))
+            rx = float(cmd.get('rx', 0.0))
+            ry = float(cmd.get('ry', 0.0))
+            rz = float(cmd.get('rz', 0.0))
+            
+            target_pose = [x, y, z, rx, ry, rz]
+            
+            # Execute movement first
+            movement_success = self.controller.move_linear(target_pose)
+            
+            # Handle gripper command if present
+            gripper_success = True
+            gripper_state = None
+            
+            if 'gripper' in cmd:
+                gripper_state = cmd['gripper']
+                if gripper_state in [0, 1]:
+                    # Add small delay to ensure movement completion
+                    time.sleep(0.2)
+                    try:
+                        gripper_success = self.controller.set_gripper(int(gripper_state))
+                        if not gripper_success and not ignore_gripper_errors:
+                            self.logger.warning("Movement completed but gripper command failed")
+                        elif not gripper_success:
+                            self.logger.debug("Gripper command ignored (gripper not available)")
+                            gripper_success = True  # Don't fail the whole command
+                    except Exception as e:
+                        if ignore_gripper_errors:
+                            self.logger.debug(f"Gripper error ignored: {e}")
+                            gripper_success = True
+                        else:
+                            self.logger.error(f"Gripper control failed: {e}")
+                            gripper_success = False
+                else:
+                    self.logger.warning(f"Invalid gripper state: {gripper_state}. Use 0 (open) or 1 (closed)")
+                    gripper_success = ignore_gripper_errors
+            
+            # Log command
+            if log_f:
+                log_entry = {
+                    'timestamp': time.time(),
+                    'target_pose': target_pose,
+                    'command_type': 'absolute_pose_with_gripper',
+                    'gripper_state': gripper_state,
+                    'movement_success': movement_success,
+                    'gripper_success': gripper_success
+                }
+                log_f.write(json.dumps(log_entry) + '\n')
+                log_f.flush()
+            
+            return movement_success and gripper_success
+            
+        except (ValueError, KeyError) as e:
+            self.logger.error(f"Invalid command format: {e}")
+            return False
+    
+    def process_synchronous_poses_with_gripper(self, json_file: str, log_file: Optional[str] = None,
+                                              responsiveness: float = 1.0, 
+                                              ignore_gripper_errors: bool = True) -> None:
+        """
+        Process absolute pose commands with gripper control from JSON file synchronously.
+        
+        Args:
+            json_file: Path to JSONL file with pose and gripper commands
+            log_file: Optional log file path
+            responsiveness: Time between commands in seconds
+            ignore_gripper_errors: If True, continue execution even if gripper fails
+        """
+        if not self.controller.is_connected():
+            self.logger.error("Robot not connected")
+            return
+        
+        log_f = None
+        if log_file:
+            log_f = open(log_file, 'a')
+        
+        try:
+            with open(json_file, 'r') as f:
+                for line_num, line in enumerate(f, 1):
+                    if not line.strip():
+                        continue
+                    
+                    try:
+                        cmd = json.loads(line)
+                        if self._execute_pose_with_gripper_command(cmd, log_f, ignore_gripper_errors):
+                            time.sleep(responsiveness)
+                        else:
+                            self.logger.error(f"Failed to execute command on line {line_num}")
+                            if not ignore_gripper_errors:
+                                break
+                    except json.JSONDecodeError as e:
+                        self.logger.error(f"Invalid JSON on line {line_num}: {e}")
+                        continue
+                        
+        except FileNotFoundError:
+            self.logger.error(f"Command file not found: {json_file}")
+        except KeyboardInterrupt:
+            self.logger.info("Interrupted by user")
+        finally:
+            if log_f:
+                log_f.close()
     
     def _execute_delta_command(self, cmd: Dict, log_f: Optional[TextIO] = None) -> bool:
         """Execute a delta movement command."""

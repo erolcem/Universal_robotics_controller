@@ -1,0 +1,44 @@
+{
+  "mir_ip": "mir.com",
+  "mir_username": "Distributor",
+  "mir_password": "distributor",
+  "test_timestamp": 1756790076.0528276,
+  "test_date": "2025-09-02 15:14:36",
+  "mir_status": {
+    "allowed_methods": null,
+    "battery_percentage": 65.69999694824219,
+    "battery_time_remaining": 31521,
+    "distance_to_next_target": 0.175849050283432,
+    "errors": [],
+    "footprint": "[[0.506,-0.32],[0.506,0.32],[-0.454,0.32],[-0.454,-0.32]]",
+    "joystick_low_speed_mode_enabled": false,
+    "joystick_web_session_id": "",
+    "map_id": "96c698b0-67bc-11f0-8eec-94c691a3e366",
+    "mission_queue_id": 3787,
+    "mission_queue_url": "/v2.0.0/mission_queue/3787",
+    "mission_text": "Moving to 'PL2' (0.2 meters to goal)",
+    "mode_id": 7,
+    "mode_key_state": "idle",
+    "mode_text": "Mission",
+    "moved": 11426.12866173754,
+    "position": {
+      "orientation": -12.84022045135498,
+      "x": 5.562397003173828,
+      "y": 4.635976791381836
+    },
+    "robot_model": "MiR100",
+    "robot_name": "MiR_R1069",
+    "safety_system_muted": false,
+    "serial_number": "180100002201069",
+    "session_id": "0ab27758-46b7-11e9-9b7c-94c691a3e366",
+    "state_id": 5,
+    "state_text": "Executing",
+    "unloaded_map_changes": false,
+    "uptime": 4976,
+    "user_prompt": null,
+    "velocity": {
+      "angular": -3.2119998931884766,
+      "linear": 0.11770544201135635
+    }
+  }
+}

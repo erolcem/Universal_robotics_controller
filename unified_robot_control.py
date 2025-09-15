@@ -597,11 +597,9 @@ class UnifiedRobotController:
                 elif cmd_type == "gripper":
                     action = command["action"]
                     if action == "open":
-                        return "set_tool_digital_out(0, False)
-set_tool_digital_out(1, True)"
+                        return "set_tool_digital_out(0, False)\nset_tool_digital_out(1, True)"
                     elif action == "close":
-                        return "set_tool_digital_out(0, True)
-set_tool_digital_out(1, False)"
+                        return "set_tool_digital_out(0, True)\nset_tool_digital_out(1, False)"
             
             # Handle old format (x, y, z, rx, ry, rz) - same as original system
             elif all(key in command for key in ['x', 'y', 'z', 'rx', 'ry', 'rz']):
@@ -615,13 +613,9 @@ set_tool_digital_out(1, False)"
                 if 'gripper' in command:
                     gripper_state = command['gripper']
                     if gripper_state == 1:  # Close
-                        script += "
-set_tool_digital_out(0, True)
-set_tool_digital_out(1, False)"
+                        script += "\nset_tool_digital_out(0, True)\nset_tool_digital_out(1, False)"
                     else:  # Open
-                        script += "
-set_tool_digital_out(0, False)
-set_tool_digital_out(1, True)"
+                        script += "\nset_tool_digital_out(0, False)\nset_tool_digital_out(1, True)"
                 
                 return script
                     
@@ -629,7 +623,6 @@ set_tool_digital_out(1, True)"
         except Exception as e:
             print(f"❌ Error building URScript: {e}")
             return None
-                    elif action == "close":
                         return "set_tool_digital_out(0, True)\nset_tool_digital_out(1, False)"
             
             # Handle old format with direct coordinates (backward compatibility)

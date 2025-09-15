@@ -2,11 +2,11 @@
   "running": true,
   "paused": false,
   "current_speed": 0.1,
-  "speed_multiplier": 2.0,
-  "effective_speed": 0.2,
-  "functions_executed": 22,
-  "commands_executed": 136,
+  "speed_multiplier": 1.0,
+  "effective_speed": 0.1,
+  "functions_executed": 1,
+  "commands_executed": 2,
   "queue_size": 0,
-  "timestamp": 1757398292.5089257,
-  "uptime": 1468.1719172000885
+  "timestamp": 1757916934.909203,
+  "uptime": 5.984856128692627
 }

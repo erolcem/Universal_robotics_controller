@@ -1,0 +1,8 @@
+2025-09-12 13:47:19: pickup (MIR pause: True)
+2025-09-12 13:47:22: compact (MIR pause: False)
+2025-09-12 13:47:27: home (MIR pause: True)
+2025-09-12 13:47:30: dropoff1 (MIR pause: True)
+2025-09-12 13:47:33: home (MIR pause: True)
+2025-09-12 13:47:36: compact (MIR pause: False)
+2025-09-12 13:47:41: pickup (MIR pause: True)
+2025-09-12 13:47:44: compact (MIR pause: False)

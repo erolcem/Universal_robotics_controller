@@ -43,7 +43,8 @@ class SimpleUnifiedRobotController:
         self.mir_ip = mir_ip
         self.mir_control = None
         self.mir_enabled = False
-        self.mir_auto_pause = True
+        # Default: do NOT auto-pause per function unless explicitly requested
+        self.mir_auto_pause = False
         
         # Queues and state (same as original)
         self.function_queue = queue.Queue()
@@ -64,6 +65,10 @@ class SimpleUnifiedRobotController:
         self.functions_executed = 0
         self.commands_executed = 0
         self.start_time = None
+        # Execution state for MIR coordination
+        self.executing_function = False
+        self.defer_mir_resume_until_empty = False
+        self.pending_commands = 0  # number of robot commands still to be executed
         
         # Control files for external interface
         self.command_file = self.control_dir / "robot_commands.txt"
@@ -314,6 +319,40 @@ class SimpleUnifiedRobotController:
         except Exception as e:
             print(f"❌ MIR resume error: {e}")
             return False
+
+    def request_mir_resume(self):
+        """Request MIR resume; defer until queue empty if mid-execution"""
+        if not self.mir_enabled:
+            print("❌ MIR not enabled; cannot resume")
+            self._write_response("MIR resume requested but MIR is disabled")
+            return False
+        # If we're currently executing or have pending functions, defer resume
+        if self.executing_function or not self.function_queue.empty() or self.pending_commands > 0:
+            self.defer_mir_resume_until_empty = True
+            print("⏳ MIR resume deferred until function queue is empty")
+            self._write_response("MIR resume deferred")
+            return True
+        # Safe to resume immediately
+        return self.mir_resume()
+
+    def _maybe_deferred_mir_resume(self):
+        """If a resume was deferred, and it's now safe, perform it."""
+        if (
+            self.mir_enabled
+            and self.defer_mir_resume_until_empty
+            and not self.executing_function
+            and self.function_queue.empty()
+            and self.pending_commands == 0
+        ):
+            try:
+                # Only resume if MIR is actually paused
+                if self.mir_control.is_paused():
+                    self.mir_resume()
+                else:
+                    print("ℹ️  Deferred resume skipped (MIR not paused)")
+                self.defer_mir_resume_until_empty = False
+            except Exception as e:
+                print(f"⚠️  Deferred MIR resume error: {e}")
     
     def mir_status(self):
         """Display MIR status"""
@@ -419,19 +458,21 @@ class SimpleUnifiedRobotController:
             elif cmd == "add" and len(parts) > 1:
                 function_name = parts[1]
                 speed = float(parts[2]) if len(parts) > 2 else None
-                pause_mir = parts[3].lower() == "true" if len(parts) > 3 else None
+                # If flag omitted, default to False (no per-function pause)
+                pause_mir = parts[3].lower() == "true" if len(parts) > 3 else False
                 self.add_function(function_name, speed, pause_mir)
             elif cmd == "ur_add" and len(parts) > 1:
                 function_name = parts[1]
                 speed = float(parts[2]) if len(parts) > 2 else None
-                pause_mir = parts[3].lower() == "true" if len(parts) > 3 else None
+                # If flag omitted, default to False (no per-function pause)
+                pause_mir = parts[3].lower() == "true" if len(parts) > 3 else False
                 self.add_function(function_name, speed, pause_mir)
                 
             # MIR control
             elif cmd == "mir_pause":
                 self.mir_pause()
             elif cmd == "mir_resume":
-                self.mir_resume()
+                self.request_mir_resume()
             elif cmd == "mir_status":
                 self.mir_status()
             elif cmd == "mir_auto" and len(parts) > 1:
@@ -460,6 +501,8 @@ class SimpleUnifiedRobotController:
         while self.running:
             # Update status file
             self._update_status_file()
+            # Check if we can perform a deferred MIR resume
+            self._maybe_deferred_mir_resume()
             
             # Check for pause
             while self.paused and self.running:
@@ -476,6 +519,7 @@ class SimpleUnifiedRobotController:
                 print(f"\n🎯 Executing function '{function_name}' ({len(commands)} commands)")
                 effective_speed = base_speed * self.speed_multiplier
                 print(f"⚡ Effective speed: {effective_speed:.3f} m/s (base: {base_speed}, multiplier: {self.speed_multiplier}x)")
+                self.executing_function = True
                 
                 # Pause MIR if requested
                 mir_was_paused = False
@@ -497,13 +541,16 @@ class SimpleUnifiedRobotController:
                     pose = [cmd['x'], cmd['y'], cmd['z'], cmd['rx'], cmd['ry'], cmd['rz']]
                     current_effective = base_speed * self.speed_multiplier
                     self.command_queue.put(("pose", (pose, current_effective)))
+                    self.pending_commands += 1
                     
                     # Add gripper command if present
                     if 'gripper' in cmd:
                         self.command_queue.put(("gripper", cmd['gripper']))
+                        self.pending_commands += 1
                     
                     # Add wait between commands
                     self.command_queue.put(("wait", 1.5))
+                    self.pending_commands += 1
                 
                 self.functions_executed += 1
                 self.function_queue.task_done()
@@ -513,7 +560,18 @@ class SimpleUnifiedRobotController:
                 # Resume MIR if it was paused for this operation
                 if mir_was_paused and self.mir_enabled:
                     time.sleep(0.5)  # Brief pause before resuming
-                    self.mir_resume()
+                    # If a deferred resume has been requested, don't resume here; it will be handled later
+                    if self.defer_mir_resume_until_empty:
+                        print("⏳ MIR resume deferred (hold until queue empty)")
+                    else:
+                        # Only resume if there are no pending commands
+                        if self.pending_commands == 0:
+                            self.mir_resume()
+                        else:
+                            print("⏳ MIR resume deferred (pending commands in queue)")
+                # Mark function execution end and check deferred resume condition
+                self.executing_function = False
+                self._maybe_deferred_mir_resume()
                 
             except queue.Empty:
                 # No functions to process, wait for commands or new functions
@@ -530,6 +588,8 @@ class SimpleUnifiedRobotController:
                     if self.send_urscript(script):
                         print(f"🎯 → [{x:6.3f}, {y:6.3f}, {z:6.3f}] @ {speed:.3f} m/s")
                         self.commands_executed += 1
+                    # Mark command completed
+                    self.pending_commands = max(0, self.pending_commands - 1)
                 
                 elif cmd_type == "gripper":
                     state = data
@@ -538,12 +598,16 @@ class SimpleUnifiedRobotController:
                         status = "OPEN" if state else "CLOSE"
                         print(f"🦾 Gripper → {status}")
                         self.commands_executed += 1
+                    self.pending_commands = max(0, self.pending_commands - 1)
                 
                 elif cmd_type == "wait":
                     duration = data
                     time.sleep(duration)
+                    self.pending_commands = max(0, self.pending_commands - 1)
                 
                 self.command_queue.task_done()
+                # Check if we can perform a deferred MIR resume after draining one command
+                self._maybe_deferred_mir_resume()
                 
             except queue.Empty:
                 pass

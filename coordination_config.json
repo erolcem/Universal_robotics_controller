@@ -1,0 +1,65 @@
+{
+    "mir_config": {
+        "ip": "118.138.127.231",
+        "base_url": "http://118.138.127.231/api/v2.0.0",
+        "check_interval": 0.5,
+        "position_tolerance": 0.3
+    },
+    "target_locations": {
+        "pickup_station": {
+            "position": {"x": 1.0, "y": 2.0},
+            "tolerance": 0.3,
+            "ur_function": "pickup",
+            "description": "Main pickup station - collect pipes",
+            "priority": 1
+        },
+        "dropoff_left_1": {
+            "position": {"x": 5.0, "y": 1.0},
+            "tolerance": 0.3,
+            "ur_function": "dropoff3_safe",
+            "description": "Left scaffold - position 1",
+            "priority": 2
+        },
+        "dropoff_left_2": {
+            "position": {"x": 5.0, "y": 3.0},
+            "tolerance": 0.3,
+            "ur_function": "dropoff4_safe", 
+            "description": "Left scaffold - position 2",
+            "priority": 2
+        },
+        "dropoff_right_1": {
+            "position": {"x": 7.0, "y": 1.0},
+            "tolerance": 0.3,
+            "ur_function": "dropoff1",
+            "description": "Right scaffold - position 1",
+            "priority": 2
+        },
+        "dropoff_right_2": {
+            "position": {"x": 7.0, "y": 3.0},
+            "tolerance": 0.3,
+            "ur_function": "dropoff2",
+            "description": "Right scaffold - position 2", 
+            "priority": 2
+        },
+        "home_base": {
+            "position": {"x": 0.0, "y": 0.0},
+            "tolerance": 0.5,
+            "ur_function": "home",
+            "description": "Home base position",
+            "priority": 3
+        }
+    },
+    "workflow_sequences": {
+        "delivery_cycle": [
+            "pickup_station",
+            "dropoff_right_1", 
+            "pickup_station",
+            "dropoff_right_2",
+            "pickup_station", 
+            "dropoff_left_1",
+            "pickup_station",
+            "dropoff_left_2",
+            "home_base"
+        ]
+    }
+}
